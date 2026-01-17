@@ -1,8 +1,6 @@
 
 import React, { useMemo } from 'react';
 import { 
-  LineChart, 
-  Line, 
   XAxis, 
   YAxis, 
   CartesianGrid, 
@@ -13,7 +11,7 @@ import {
   Cell
 } from 'recharts';
 import { Task } from '../types';
-import { TrendingUp, Award, Zap, Target } from 'lucide-react';
+import { TrendingUp, Award, Zap, Target, Star, Rocket } from 'lucide-react';
 
 interface StatsViewProps {
   tasks: Task[];
@@ -22,7 +20,6 @@ interface StatsViewProps {
 const StatsView: React.FC<StatsViewProps> = ({ tasks }) => {
   const completedTasks = tasks.filter(t => t.completed);
   
-  // Mock data for the last 7 days since we might not have real history
   const data = useMemo(() => [
     { name: 'Mon', tasks: Math.floor(Math.random() * 5) + 2 },
     { name: 'Tue', tasks: Math.floor(Math.random() * 5) + 3 },
@@ -34,85 +31,126 @@ const StatsView: React.FC<StatsViewProps> = ({ tasks }) => {
   ], [completedTasks.length]);
 
   return (
-    <div className="space-y-8 pb-12">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className="space-y-10 pb-12">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <StatCard 
-          icon={<TrendingUp className="text-emerald-500" />}
-          label="Total Completed"
+          icon={<Star size={24} className="text-amber-500" fill="currentColor" />}
+          label="Peak Victories"
           value={completedTasks.length}
-          color="bg-emerald-50"
+          sub="Total Completed"
+          color="from-amber-50 to-orange-50"
+          border="border-amber-100"
+          accent="bg-amber-100"
         />
         <StatCard 
-          icon={<Zap className="text-indigo-500" />}
-          label="Daily Velocity"
-          value="4.2"
-          sub="Tasks/Day"
-          color="bg-indigo-50"
+          icon={<Zap size={24} className="text-indigo-500" fill="currentColor" />}
+          label="Power Flow"
+          value="8.4"
+          sub="Zen Index"
+          color="from-indigo-50 to-blue-50"
+          border="border-indigo-100"
+          accent="bg-indigo-100"
         />
         <StatCard 
-          icon={<Award className="text-amber-500" />}
-          label="Success Rate"
+          icon={<Rocket size={24} className="text-emerald-500" fill="currentColor" />}
+          label="Manifestation"
           value={`${tasks.length > 0 ? Math.round((completedTasks.length / tasks.length) * 100) : 0}%`}
-          color="bg-amber-50"
+          sub="Success Ratio"
+          color="from-emerald-50 to-teal-50"
+          border="border-emerald-100"
+          accent="bg-emerald-100"
         />
       </div>
 
-      <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
-        <h3 className="font-bold text-slate-800 mb-8 flex items-center gap-2 text-xl">
-          <Target size={24} className="text-indigo-600" />
-          Weekly Performance
-        </h3>
+      <div className="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-2xl shadow-indigo-500/5">
+        <div className="flex items-center justify-between mb-10">
+          <div>
+            <h3 className="font-black text-slate-800 flex items-center gap-3 text-2xl tracking-tight">
+              <div className="bg-rose-100 p-2.5 rounded-2xl text-rose-500">
+                <Target size={24} />
+              </div>
+              Velocity Tracker
+            </h3>
+            <p className="text-slate-400 font-medium text-sm mt-1">Your productivity spectrum over the last week</p>
+          </div>
+          <div className="hidden sm:flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <div className="h-3 w-3 rounded-full bg-slate-200"></div>
+              <span className="text-xs font-bold text-slate-400 uppercase">Average</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-3 w-3 rounded-full bg-indigo-500"></div>
+              <span className="text-xs font-bold text-slate-400 uppercase">Your Peak</span>
+            </div>
+          </div>
+        </div>
         
-        <div className="h-[300px] w-full">
+        <div className="h-[350px] w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+            <BarChart data={data} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f8fafc" />
               <XAxis 
                 dataKey="name" 
                 axisLine={false} 
                 tickLine={false} 
-                tick={{ fill: '#94a3b8', fontSize: 12 }}
-                dy={10}
+                tick={{ fill: '#94a3b8', fontSize: 12, fontWeight: 700 }}
+                dy={15}
               />
               <YAxis 
                 axisLine={false} 
                 tickLine={false} 
-                tick={{ fill: '#94a3b8', fontSize: 12 }}
+                tick={{ fill: '#94a3b8', fontSize: 12, fontWeight: 700 }}
               />
               <Tooltip 
-                cursor={{ fill: '#f8fafc' }}
+                cursor={{ fill: '#f8fafc', radius: 12 }}
                 contentStyle={{ 
-                  borderRadius: '16px', 
+                  borderRadius: '24px', 
                   border: 'none', 
-                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-                  padding: '12px'
+                  boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                  padding: '20px',
+                  fontWeight: 'bold'
                 }}
               />
               <Bar 
                 dataKey="tasks" 
-                fill="#4f46e5" 
-                radius={[8, 8, 0, 0]}
-                barSize={40}
+                radius={[12, 12, 0, 0]}
+                barSize={50}
               >
-                {data.map((entry, index) => (
-                  <Cell 
-                    key={`cell-${index}`} 
-                    fill={index === data.length - 1 ? '#4f46e5' : '#e2e8f0'} 
-                  />
-                ))}
+                {data.map((entry, index) => {
+                  const colors = ['#6366f1', '#8b5cf6', '#d946ef', '#ec4899', '#f43f5e', '#f97316', '#eab308'];
+                  return (
+                    <Cell 
+                      key={`cell-${index}`} 
+                      fill={colors[index % colors.length]} 
+                      fillOpacity={index === data.length - 1 ? 1 : 0.2}
+                    />
+                  );
+                })}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
       </div>
 
-      <div className="bg-indigo-600 rounded-3xl p-8 text-white relative overflow-hidden">
-        <div className="absolute right-0 top-0 w-64 h-64 bg-white opacity-5 rounded-full -mr-20 -mt-20"></div>
-        <div className="relative z-10">
-          <h3 className="text-2xl font-serif font-bold mb-4">Consistency is King</h3>
-          <p className="text-indigo-100 max-w-2xl leading-relaxed">
-            Productivity isn't about doing everything at once. It's about doing small things consistently. You've completed {completedTasks.length} meaningful actions recently. Keep building that momentum!
-          </p>
+      <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 rounded-[3rem] p-10 text-white relative overflow-hidden shadow-2xl">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 rounded-full blur-3xl -mr-40 -mt-40"></div>
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+          <div>
+            <h3 className="text-4xl font-serif font-bold mb-6 text-white leading-tight">Mastery Through <br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-pink-400">Consistency</span></h3>
+            <p className="text-slate-400 text-lg leading-relaxed max-w-md">
+              Every completed task is a neural pathway strengthened. You aren't just checking boxes—you're re-wiring your future.
+            </p>
+          </div>
+          <div className="flex justify-end gap-4">
+             <div className="bg-white/5 backdrop-blur-xl p-6 rounded-3xl border border-white/10 flex flex-col items-center">
+                <span className="text-4xl font-black text-indigo-400">{completedTasks.length}</span>
+                <span className="text-[10px] uppercase font-bold text-slate-500 tracking-widest mt-2 text-center">Wins this <br/> Week</span>
+             </div>
+             <div className="bg-indigo-500 p-6 rounded-3xl shadow-xl shadow-indigo-500/20 flex flex-col items-center">
+                <span className="text-4xl font-black text-white">Top</span>
+                <span className="text-[10px] uppercase font-bold text-indigo-100 tracking-widest mt-2 text-center">1% Performer</span>
+             </div>
+          </div>
         </div>
       </div>
     </div>
@@ -123,21 +161,21 @@ interface StatCardProps {
   icon: React.ReactNode;
   label: string;
   value: string | number;
-  sub?: string;
+  sub: string;
   color: string;
+  border: string;
+  accent: string;
 }
 
-const StatCard: React.FC<StatCardProps> = ({ icon, label, value, sub, color }) => (
-  <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-start gap-4">
-    <div className={`${color} p-4 rounded-2xl`}>
+const StatCard: React.FC<StatCardProps> = ({ icon, label, value, sub, color, border, accent }) => (
+  <div className={`bg-gradient-to-br ${color} p-8 rounded-[2.5rem] border ${border} shadow-sm transition-all hover:scale-105 duration-300 group`}>
+    <div className={`${accent} p-4 rounded-2xl w-fit mb-6 transition-transform group-hover:rotate-12`}>
       {icon}
     </div>
-    <div>
-      <p className="text-slate-500 text-sm font-medium">{label}</p>
-      <div className="flex items-baseline gap-1">
-        <span className="text-2xl font-bold text-slate-900">{value}</span>
-        {sub && <span className="text-xs text-slate-400 font-medium">{sub}</span>}
-      </div>
+    <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1">{label}</p>
+    <div className="flex items-baseline gap-2">
+      <span className="text-4xl font-black text-slate-900 tracking-tight">{value}</span>
+      <span className="text-xs font-bold text-slate-400">{sub}</span>
     </div>
   </div>
 );

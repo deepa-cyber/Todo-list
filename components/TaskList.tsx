@@ -13,16 +13,15 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onToggle, onDelete }) => {
   if (tasks.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full py-20 text-slate-400 px-6 text-center">
-        <div className="bg-slate-50 p-6 rounded-full mb-4">
-          <Circle size={48} className="opacity-20" />
+        <div className="bg-gradient-to-tr from-slate-50 to-indigo-50 p-8 rounded-full mb-6">
+          <Circle size={56} className="text-slate-200" />
         </div>
-        <h3 className="text-lg font-medium text-slate-600 mb-1">Clear Mind</h3>
-        <p className="max-w-xs">No tasks scheduled. Why not add something for a specific date?</p>
+        <h3 className="text-2xl font-serif font-bold text-slate-800 mb-2">Tabula Rasa</h3>
+        <p className="max-w-xs text-slate-400 font-medium">Your canvas is clear. What magnificent achievement will you record first?</p>
       </div>
     );
   }
 
-  // Group tasks by date
   const groupedTasks = tasks.reduce((groups, task) => {
     const date = task.dueDate;
     if (!groups[date]) {
@@ -32,12 +31,18 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onToggle, onDelete }) => {
     return groups;
   }, {} as Record<string, Task[]>);
 
-  // Sort dates
   const sortedDates = Object.keys(groupedTasks).sort();
+
+  const getHeaderStyle = (dateStr: string) => {
+    const today = new Date().toISOString().split('T')[0];
+    if (dateStr === today) return "bg-indigo-600 text-white shadow-lg shadow-indigo-200";
+    if (dateStr < today) return "bg-rose-50 text-rose-600 border-rose-100";
+    return "bg-slate-900 text-white";
+  };
 
   const formatDateLabel = (dateStr: string) => {
     const today = new Date().toISOString().split('T')[0];
-    if (dateStr === today) return "Today";
+    if (dateStr === today) return "Today's Battlefield";
     
     const d = new Date(dateStr + 'T00:00:00');
     return d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
@@ -46,7 +51,6 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onToggle, onDelete }) => {
   const getGoogleCalendarUrl = (task: Task) => {
     const date = task.dueDate.replace(/-/g, '');
     const title = encodeURIComponent(task.text);
-    // Google Calendar all-day event end date is exclusive, so we add 1 day
     const endDate = new Date(task.dueDate + 'T00:00:00');
     endDate.setDate(endDate.getDate() + 1);
     const endDateStr = endDate.toISOString().split('T')[0].replace(/-/g, '');
@@ -54,56 +58,61 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onToggle, onDelete }) => {
   };
 
   return (
-    <div className="divide-y divide-slate-100">
+    <div className="space-y-0">
       {sortedDates.map(date => (
-        <div key={date} className="pb-4">
-          <div className="bg-slate-50/50 px-6 py-3 border-y border-slate-100 flex items-center gap-2">
-            <CalendarDays size={14} className="text-indigo-400" />
-            <h4 className="text-[11px] uppercase tracking-wider font-bold text-slate-400">
-              {formatDateLabel(date)}
-            </h4>
+        <div key={date} className="group/date">
+          <div className={`px-8 py-4 flex items-center justify-between transition-all ${getHeaderStyle(date)}`}>
+            <div className="flex items-center gap-3">
+              <CalendarDays size={18} />
+              <h4 className="text-sm uppercase tracking-[0.2em] font-black">
+                {formatDateLabel(date)}
+              </h4>
+            </div>
+            <span className="text-xs font-bold opacity-60">
+              {groupedTasks[date].length} {groupedTasks[date].length === 1 ? 'Task' : 'Tasks'}
+            </span>
           </div>
-          <ul className="divide-y divide-slate-50">
+          <ul className="divide-y divide-slate-100 bg-white">
             {groupedTasks[date].sort((a, b) => b.createdAt - a.createdAt).map((task) => (
               <li 
                 key={task.id} 
-                className={`group flex items-center gap-4 p-5 hover:bg-indigo-50/30 transition-colors ${task.completed ? 'opacity-60' : ''}`}
+                className={`group flex items-center gap-5 p-6 hover:bg-slate-50/80 transition-all border-l-4 border-transparent hover:border-indigo-500 ${task.completed ? 'opacity-40' : ''}`}
               >
-                <div className="text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <GripVertical size={18} />
+                <div className="text-slate-200 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <GripVertical size={20} />
                 </div>
                 
                 <button 
                   onClick={() => onToggle(task.id)}
-                  className={`flex-shrink-0 transition-all duration-300 ${task.completed ? 'text-indigo-500 scale-110' : 'text-slate-300 hover:text-indigo-400'}`}
+                  className={`flex-shrink-0 transition-all duration-500 transform hover:scale-125 ${task.completed ? 'text-emerald-500' : 'text-slate-300 hover:text-indigo-500'}`}
                 >
-                  {task.completed ? <CheckCircle2 size={24} /> : <Circle size={24} />}
+                  {task.completed ? <CheckCircle2 size={28} strokeWidth={2.5} /> : <Circle size={28} strokeWidth={2} />}
                 </button>
 
                 <div className="flex-1 min-w-0">
-                  <p className={`text-lg transition-all truncate ${task.completed ? 'line-through text-slate-400' : 'text-slate-700'}`}>
+                  <p className={`text-xl font-medium transition-all ${task.completed ? 'line-through text-slate-400 italic' : 'text-slate-800'}`}>
                     {task.text}
                   </p>
                 </div>
 
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
                   {!task.completed && (
                     <a 
                       href={getGoogleCalendarUrl(task)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-indigo-400 hover:text-indigo-600 p-2 hover:bg-indigo-100 rounded-xl transition-colors"
-                      title="Sync to Google Calendar"
+                      className="text-indigo-400 hover:text-white p-2.5 hover:bg-indigo-500 rounded-2xl transition-all shadow-sm"
+                      title="Sync to Calendar"
                     >
-                      <CalendarPlus size={18} />
+                      <CalendarPlus size={20} />
                     </a>
                   )}
                   <button 
                     onClick={() => onDelete(task.id)}
-                    className="text-slate-300 hover:text-red-500 p-2 hover:bg-red-50 rounded-xl transition-colors"
-                    title="Delete Task"
+                    className="text-slate-300 hover:text-white p-2.5 hover:bg-rose-500 rounded-2xl transition-all"
+                    title="Banish Task"
                   >
-                    <Trash2 size={18} />
+                    <Trash2 size={20} />
                   </button>
                 </div>
               </li>
